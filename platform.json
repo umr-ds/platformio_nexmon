@@ -1,0 +1,32 @@
+{
+    "name": "cypress",
+    "title": "Cypress",
+    "description": "",
+    "homepage": "",
+    "license": "",
+    "keywords": [
+        "dev_platform",
+        "Wi-Fi"
+    ],
+    "engines": {
+        "platformio": "^5"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/IceBlockProduction/platform-cypress.git"
+    },
+    "version": "0.0.1",
+    "frameworks": {
+        "nexmon": {
+            "package": "framework-nexmon",
+            "script": "builder/frameworks/nexmon.py"
+        }
+    },
+    "packages": {
+        "framework-nexmon": {
+            "type": "framework",
+            "optional": false,
+            "version": "https://github.com/seemoo-lab/nexmon.git"
+        }
+    }
+}
