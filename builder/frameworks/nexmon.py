@@ -12,50 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from io import open
-from os import listdir
-from os.path import isdir, isfile, join
 
-from SCons.Script import DefaultEnvironment
+"""
+Nexmon
+
+Nexmon is a C-based firmware patching framework for Broadcom/Cypress WiFi chips 
+that enables you to write your own firmware patches, 
+for example, to enable monitor mode with radiotap headers and frame injection.
+
+https://www.maki.tu-darmstadt.de/sfb_maki/knowledge_transfer/demonstratoren/nexmon/nexmon.de.jsp
+
+"""
+
+import sys
+from os.path import isfile, join
+
+from SCons.Script import DefaultEnvironment, SConscript
+from SCons.Subst import raise_exception
 
 env = DefaultEnvironment()
-platform = env.PioPlatform()
+mcu = env.BoardConfig().get("build.mcu")
 
-FRAMEWORK_DIR = platform.get_package_dir("framework-nexmon")
-FRAMEWORK_VERSION = platform.get_package_version("framework-nexmon")
+if mcu == "bcm43430a1":
+    build_script = join(
+        env.PioPlatform().get_package_dir("framework-nexmon"),
+        "tools",
+        "platformio-build.py",
+    )
+else:
+    raise_exception("Unknown target mcu")
 
-env.Replace(
-    CPPFLAGS=[
-        "-O2",
-        "-Wformat=2",
-        "-Wall",
-        "-Winline",
-        "-pipe",
-        "-fPIC"
-    ],
+if not isfile(build_script):
+    sys.stderr.write(f"Error: Missing PlatformIO build script {build_script}\n")
+    env.Exit(1)
 
-    LIBS=["pthread"]
-)
-
-env.Append(
-    CPPDEFINES=[
-        "_GNU_SOURCE"
-    ],
-
-    CPPPATH=[
-        join(env.PioPlatform().get_package_dir(
-             "framework-nexmon"), "nexmon")
-    ]
-)
-
-#
-# Target: Build Core Library
-#
-
-libs = []
-libs.append(env.BuildLibrary(
-    join("$BUILD_DIR", "FrameworkNexmon"),
-    join(env.PioPlatform().get_package_dir("framework-nexmon"), "nexmon")
-))
-
-env.Append(LIBS=libs)
+SConscript(build_script)

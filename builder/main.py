@@ -12,51 +12,100 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-    Builder for Nexmon-Platform
-"""
+import sys
+from platform import system
+from os import makedirs
+from os.path import basename, isdir, join
 
-from SCons.Script import AlwaysBuild, Default, DefaultEnvironment
-
-from platformio.util import get_systype
-
-env = DefaultEnvironment()
-
-env.Replace(
-    _BINPREFIX="",
-    AR="${_BINPREFIX}ar",
-    AS="${_BINPREFIX}as",
-    CC="${_BINPREFIX}gcc",
-    CXX="${_BINPREFIX}g++",
-    GDB="${_BINPREFIX}gdb",
-    OBJCOPY="${_BINPREFIX}objcopy",
-    RANLIB="${_BINPREFIX}ranlib",
-    SIZETOOL="${_BINPREFIX}size",
-
-    SIZEPRINTCMD='$SIZETOOL $SOURCES'
+from SCons.Script import (
+    ARGUMENTS,
+    COMMAND_LINE_TARGETS,
+    AlwaysBuild,
+    Builder,
+    Default,
+    DefaultEnvironment,
 )
 
-if get_systype() == "darwin_x86_64":
-    env.Replace(
-        _BINPREFIX="arm-linux-gnueabihf-"
+
+env = DefaultEnvironment()
+# env.SConscript("compat.py", exports="env")
+platform = env.PioPlatform()
+board = env.BoardConfig()
+
+env.Replace(
+    AR="arm-none-eabi-gcc-ar",
+    AS="arm-none-eabi-as",
+    CC="arm-none-eabi-gcc",
+    CXX="arm-none-eabi-g++",
+    GDB="arm-none-eabi-gdb",
+    OBJCOPY="arm-none-eabi-objcopy",
+    RANLIB="arm-none-eabi-gcc-ranlib",
+    SIZETOOL="arm-none-eabi-size",
+    ARFLAGS=["rc"],
+    SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx)\s+(\d+).*",
+    SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
+    SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
+    SIZEPRINTCMD="$SIZETOOL -B -d $SOURCES",
+    PROGSUFFIX=".elf",
+)
+
+# Allow user to override via pre:script
+if env.get("PROGNAME", "program") == "program":
+    env.Replace(PROGNAME="firmware")
+
+env.Append(
+    BUILDERS=dict(
+        ElfToBin=Builder(
+            action=env.VerboseAction(
+                " ".join(["$OBJCOPY", "-O", "binary", "$SOURCES", "$TARGET"]),
+                "Building $TARGET",
+            ),
+            suffix=".bin",
+        ),
+        ElfToHex=Builder(
+            action=env.VerboseAction(
+                " ".join(
+                    ["$OBJCOPY", "-O", "ihex", "-R", ".eeprom", "$SOURCES", "$TARGET"]
+                ),
+                "Building $TARGET",
+            ),
+            suffix=".hex",
+        ),
     )
+)
 
-#
-# Target: Build executable program
-#
+target_elf = None
+if "nobuild" in COMMAND_LINE_TARGETS:
+    target_elf = join("$BUILD_DIR", "${PROGNAME}.elf")
+    target_firm = join("$BUILD_DIR", "${PROGNAME}.bin")
+else:
+    target_elf = env.BuildProgram()
+    target_firm = env.ElfToBin(join("$BUILD_DIR", "${PROGNAME}"), target_elf)
 
-target_bin = env.BuildProgram()
+AlwaysBuild(env.Alias("nobuild", target_firm))
+target_buildprog = env.Alias("buildprog", target_firm, target_firm)
 
 #
 # Target: Print binary size
 #
 
-target_size = env.Alias("size", target_bin, env.VerboseAction(
-    "$SIZEPRINTCMD", "Calculating size $SOURCE"))
+target_size = env.Alias(
+    "size", target_elf, env.VerboseAction("$SIZEPRINTCMD", "Calculating size $SOURCE")
+)
 AlwaysBuild(target_size)
+
+#
+# Information about obsolete method of specifying linker scripts
+#
+
+if any("-Wl,-T" in f for f in env.get("LINKFLAGS", [])):
+    print(
+        "Warning! '-Wl,-T' option for specifying linker scripts is deprecated. "
+        "Please use 'board_build.ldscript' option in your 'platformio.ini' file."
+    )
 
 #
 # Default targets
 #
 
-Default([target_bin])
+Default([target_buildprog, target_size])

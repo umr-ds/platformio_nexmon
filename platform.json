@@ -1,11 +1,12 @@
 {
     "name": "cypress",
     "title": "Cypress",
-    "description": "",
-    "homepage": "",
-    "license": "",
+    "description": "Cypress' Wi-Fi® portfolio includes IEEE 802.11a/b/g/n WLAN System-on-Chip (SoC) solutions with 1x1 SISO for up to 150 Mbps PHY data rates. These solutions can be coupled with external MCUs from popular vendors or Linux on applications processors to implement a complete Wi-Fi system. Many of the WICED® Wi-Fi devices are supported on Cypress' WICED Wi-Fi Software Development Kit (SDK) which provides code examples, tools and development support. Cypress supports Wi-Fi customers through its global network of IoT partners using production-ready, fully-certified modules.",
+    "homepage": "https://www.cypress.com/products/wi-fi",
+    "license": "Apache-2.0",
     "keywords": [
         "dev_platform",
+        "Cypress",
         "Wi-Fi"
     ],
     "engines": {
@@ -19,14 +20,44 @@
     "frameworks": {
         "nexmon": {
             "package": "framework-nexmon",
-            "script": "builder/frameworks/nexmon.py"
+            "script": "builder/frameworks/nexmon.py",
+            "description": "Nexmon is a C-based firmware patching framework for Broadcom/Cypress WiFi chips that enables you to write your own firmware patches, for example, to enable monitor mode with radiotap headers and frame injection.",
+            "homepage": "https://www.maki.tu-darmstadt.de/sfb_maki/knowledge_transfer/demonstratoren/nexmon/nexmon.de.jsp",
+            "title": "Nexmon"
         }
     },
     "packages": {
+        "toolchain-gccarmnoneeabi":{ 
+            "type": "toolchain",
+            "owner": "platformio",
+            "version": ">=1.60301.0,<1.80000.0",
+            "optionalVersions": ["~1.60301.0", "~1.80201.0", "~1.90201.0"]
+        },
         "framework-nexmon": {
             "type": "framework",
             "optional": false,
-            "version": "https://github.com/seemoo-lab/nexmon.git"
+            "owner": "TU-Darmstadt",
+            "version": "~2.2.2"
+        },
+        "tool-cmake": {
+            "optional": true,
+            "owner": "platformio",
+            "version": "~3.16.0"
+        },
+        "tool-dtc": {
+            "optional": true,
+            "owner": "platformio",
+            "version": "~1.4.7"
+        },
+        "tool-ninja": {
+            "optional": true,
+            "owner": "platformio",
+            "version": "^1.7.0"
+        },
+        "tool-gperf": {
+            "optional": true,
+            "owner": "platformio",
+            "version": "^3.0.0"
         }
     }
 }

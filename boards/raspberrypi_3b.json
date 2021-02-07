@@ -2,7 +2,7 @@
     "build": {
         "extra_flags": "-DRASPBERRYPI -DRASPBERRYPI3",
         "f_cpu": "1200000000L",
-        "mcu": "bcm2837"
+        "mcu": "bcm43430a1"
     },
     "frameworks": [
         "nexmon"
