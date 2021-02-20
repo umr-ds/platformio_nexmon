@@ -17,45 +17,29 @@
         "url": "https://github.com/IceBlockProduction/platform-cypress.git"
     },
     "version": "0.0.1",
-    "frameworks": {
-        "nexmon": {
-            "package": "framework-nexmon",
-            "script": "builder/frameworks/nexmon.py",
-            "description": "Nexmon is a C-based firmware patching framework for Broadcom/Cypress WiFi chips that enables you to write your own firmware patches, for example, to enable monitor mode with radiotap headers and frame injection.",
-            "homepage": "https://www.maki.tu-darmstadt.de/sfb_maki/knowledge_transfer/demonstratoren/nexmon/nexmon.de.jsp",
-            "title": "Nexmon"
-        }
-    },
     "packages": {
         "toolchain-gccarmnoneeabi":{ 
             "type": "toolchain",
             "owner": "platformio",
-            "version": ">=1.60301.0,<1.80000.0",
-            "optionalVersions": ["~1.60301.0", "~1.80201.0", "~1.90201.0"]
-        },
-        "framework-nexmon": {
-            "type": "framework",
-            "optional": false,
-            "owner": "TU-Darmstadt",
-            "version": "~2.2.2"
+            "version": ">=1.60301.0,<1.80000.0"
         },
         "tool-cmake": {
-            "optional": true,
+            "optional": false,
             "owner": "platformio",
             "version": "~3.16.0"
         },
         "tool-dtc": {
-            "optional": true,
+            "optional": false,
             "owner": "platformio",
             "version": "~1.4.7"
         },
         "tool-ninja": {
-            "optional": true,
+            "optional": false,
             "owner": "platformio",
             "version": "^1.7.0"
         },
         "tool-gperf": {
-            "optional": true,
+            "optional": false,
             "owner": "platformio",
             "version": "^3.0.0"
         }

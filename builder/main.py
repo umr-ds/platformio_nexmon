@@ -17,18 +17,11 @@ from platform import system
 from os import makedirs
 from os.path import basename, isdir, join
 
-from SCons.Script import (
-    ARGUMENTS,
-    COMMAND_LINE_TARGETS,
-    AlwaysBuild,
-    Builder,
-    Default,
-    DefaultEnvironment,
-)
+from SCons.Script import (ARGUMENTS, COMMAND_LINE_TARGETS, AlwaysBuild,
+                          Builder, Default, DefaultEnvironment)
 
 
 env = DefaultEnvironment()
-# env.SConscript("compat.py", exports="env")
 platform = env.PioPlatform()
 board = env.BoardConfig()
 
@@ -41,12 +34,15 @@ env.Replace(
     OBJCOPY="arm-none-eabi-objcopy",
     RANLIB="arm-none-eabi-gcc-ranlib",
     SIZETOOL="arm-none-eabi-size",
+
     ARFLAGS=["rc"],
+
     SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx)\s+(\d+).*",
     SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
     SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
-    SIZEPRINTCMD="$SIZETOOL -B -d $SOURCES",
-    PROGSUFFIX=".elf",
+    SIZEPRINTCMD='$SIZETOOL -B -d $SOURCES',
+
+    PROGSUFFIX=".elf"
 )
 
 # Allow user to override via pre:script
@@ -56,23 +52,33 @@ if env.get("PROGNAME", "program") == "program":
 env.Append(
     BUILDERS=dict(
         ElfToBin=Builder(
-            action=env.VerboseAction(
-                " ".join(["$OBJCOPY", "-O", "binary", "$SOURCES", "$TARGET"]),
-                "Building $TARGET",
-            ),
-            suffix=".bin",
+            action=env.VerboseAction(" ".join([
+                "$OBJCOPY",
+                "-O",
+                "binary",
+                "$SOURCES",
+                "$TARGET"
+            ]), "Building $TARGET"),
+            suffix=".bin"
         ),
         ElfToHex=Builder(
-            action=env.VerboseAction(
-                " ".join(
-                    ["$OBJCOPY", "-O", "ihex", "-R", ".eeprom", "$SOURCES", "$TARGET"]
-                ),
-                "Building $TARGET",
-            ),
-            suffix=".hex",
-        ),
+            action=env.VerboseAction(" ".join([
+                "$OBJCOPY",
+                "-O",
+                "ihex",
+                "-R",
+                ".eeprom",
+                "$SOURCES",
+                "$TARGET"
+            ]), "Building $TARGET"),
+            suffix=".hex"
+        )
     )
 )
+
+#
+# Target: Build executable and linkable firmware
+#
 
 target_elf = None
 if "nobuild" in COMMAND_LINE_TARGETS:
@@ -90,8 +96,8 @@ target_buildprog = env.Alias("buildprog", target_firm, target_firm)
 #
 
 target_size = env.Alias(
-    "size", target_elf, env.VerboseAction("$SIZEPRINTCMD", "Calculating size $SOURCE")
-)
+    "size", target_elf,
+    env.VerboseAction("$SIZEPRINTCMD", "Calculating size $SOURCE"))
 AlwaysBuild(target_size)
 
 #
@@ -99,10 +105,8 @@ AlwaysBuild(target_size)
 #
 
 if any("-Wl,-T" in f for f in env.get("LINKFLAGS", [])):
-    print(
-        "Warning! '-Wl,-T' option for specifying linker scripts is deprecated. "
-        "Please use 'board_build.ldscript' option in your 'platformio.ini' file."
-    )
+    print("Warning! '-Wl,-T' option for specifying linker scripts is deprecated. "
+          "Please use 'board_build.ldscript' option in your 'platformio.ini' file.")
 
 #
 # Default targets
