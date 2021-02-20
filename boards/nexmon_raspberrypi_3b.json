@@ -5,6 +5,9 @@
         "f_cpu": "1200000000L",
         "mcu": "bcm43430a1"
     },
+    "frameworks": [
+        "mbed"
+    ],
     "name": "Raspberry Pi 3 Model B Nexmon",
     "upload": {
         "maximum_ram_size": 1073741824,

@@ -27,7 +27,7 @@ class CypressPlatform(PlatformBase):
         board_config = self.board_config(variables.get("board"))
         frameworks = variables.get("pioframework", [])
 
-        if "nexmon" in frameworks:
+        if "mbed" in frameworks:
             print(board_config.get("build.mcu"))
             print("Test")
 
