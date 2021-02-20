@@ -17,11 +17,26 @@
         "url": "https://github.com/IceBlockProduction/platform-cypress.git"
     },
     "version": "0.0.1",
+    "frameworks": {
+        "mbed": {
+          "package": "framework-mbed",
+          "script": "builder/frameworks/nexmon.py",
+          "description": "Arm Mbed OS is an open source embedded operating system designed specifically for the 'things' in the Internet of Things. It includes all the features you need to develop a connected product based on an Arm Cortex-M microcontroller, including security, connectivity, an RTOS and drivers for sensors and I/O devices",
+          "homepage": "https://os.mbed.com/",
+          "title": "Mbed"
+        }
+    },
     "packages": {
         "toolchain-gccarmnoneeabi":{ 
             "type": "toolchain",
             "owner": "platformio",
             "version": ">=1.60301.0,<1.80000.0"
+        },
+        "framework-mbed": {
+            "type": "framework",
+            "optional": false,
+            "owner": "platformio",
+            "version": "~6.60600.0"
         },
         "tool-cmake": {
             "optional": false,
