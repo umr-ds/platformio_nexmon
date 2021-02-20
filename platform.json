@@ -42,21 +42,6 @@
             "optional": false,
             "owner": "platformio",
             "version": "~3.16.0"
-        },
-        "tool-dtc": {
-            "optional": false,
-            "owner": "platformio",
-            "version": "~1.4.7"
-        },
-        "tool-ninja": {
-            "optional": false,
-            "owner": "platformio",
-            "version": "^1.7.0"
-        },
-        "tool-gperf": {
-            "optional": false,
-            "owner": "platformio",
-            "version": "^3.0.0"
         }
     }
 }
