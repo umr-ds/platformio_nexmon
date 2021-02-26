@@ -24,16 +24,17 @@ from SCons.Script import (ARGUMENTS, COMMAND_LINE_TARGETS, AlwaysBuild,
 env = DefaultEnvironment()
 platform = env.PioPlatform()
 board = env.BoardConfig()
+FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
 
 env.Replace(
-    AR="arm-none-eabi-gcc-ar",
-    AS="arm-none-eabi-as",
-    CC="arm-none-eabi-gcc",
+    AR=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-ar"),
+    AS=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-as"),
+    CC=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-gcc"),
     CXX="arm-none-eabi-g++",
     GDB="arm-none-eabi-gdb",
-    OBJCOPY="arm-none-eabi-objcopy",
-    RANLIB="arm-none-eabi-gcc-ranlib",
-    SIZETOOL="arm-none-eabi-size",
+    OBJCOPY=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-objcopy"),
+    RANLIB=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-ranlib"),
+    SIZETOOL=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-size"),
 
     ARFLAGS=["rc"],
 

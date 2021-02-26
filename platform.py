@@ -29,7 +29,6 @@ class CypressPlatform(PlatformBase):
 
         if "mbed" in frameworks:
             print(board_config.get("build.mcu"))
-            print("Test")
 
         return PlatformBase.configure_default_packages(self, variables,
                                                        targets)

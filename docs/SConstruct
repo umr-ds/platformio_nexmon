@@ -1,0 +1,105 @@
+"""
+    This file is supposed to provide a summary of the SCons building system
+    used by PlatformIO to build executables
+    and to set up environments for compiling and executing code on different platforms/boards.
+
+    SCons CMD and flags:
+    Command: scons
+    -c: Clean up after build. Deletes ALL created files AFTER build done
+    -n: DON'T build. Just print commands (good for debug)
+    -q: DON'T build. Just reads through SConscript and looks if up to date
+    -Q: Quiet mode. Less verbose output
+    --debug=TYPE: Print various types of debug information
+    TYPE = count, duplicate, explain, findlibs, includes, memoizer, memory, objects, pdb, prepare, presub, stacktrace, time, action-timestamps.
+
+    Some Definitions:
+
+    something.o := C-Object file
+    something := executable file (would be called something.exe on Windows)
+
+"""
+
+# SCons first reads the SConstruct file and executes the python code WITHOUT building the targets THEN calls the builder
+print("Starting SConsscript") # <-- This is executed when SCons READS the SConstruct file, building comes afterwards
+
+# Build executable from single source file
+Program('main.c') # Output: main.o, main
+
+# Build Object Files from single source file
+Object('main.c') # Output: main.o
+
+# Each call to Program builds one executable, may specify name of executable before source file
+Program('my_program','main.c') # Output: main.o, my_program
+
+# May also build one executable from multiple targets with single call in python list
+Program('my_program', ['main.c', 'file1.c']) # Builds ONE executable from MULTIPLE files (expects only ONE main method)
+
+# May also put single file into a list (consistency and stuff)
+Program(['hello.c']) # <-- equivalent to Program('main.c')
+
+# May specify multiple files using glob
+Program('my_program', Glob('*.c')) # <-- Passes all files with .c extension
+
+# May use split to make list of files easier to read
+Program('my_program', Split('main.c file1.c file2.c')) # When called separates separates files by whitespace into single files
+
+# To make above example more readable, may also extract list of files into variable, and make multiline
+src_files = Split("""main.c
+                     file1.c
+                     file2.c
+                    """)
+Program('my_program', src_files)
+
+# To make calls more documentary, may specify keyword arguments
+Program(target='my_program', source=src_files)
+
+# To build multiple programs in single SConstruct file just call Program multiple times
+Program('first_program', 'first.c')
+Program('second_program', 'second.c') # Note: Even though second_program seems to be built after first_program it's up to SCons to decide which is built first!!
+
+# Got multiple programs to build that depend on the same librariers? Just make an extra list for them and append!
+lib = ['common1.c', 'common2.c']
+main1_files = ['main1.c'] + common
+main2_files = ['main2.c', 'file1.c'] + common
+Program('first__program', 'main1_files')
+Program('second_program', 'main2_files')
+
+# Want to build a Library that's reusable for multiple programs?
+Library('my_library', ['lib1.c', 'lib2.c', 'lib3.c']) # Builds a STATIC library from given input. Note: May also provide Object files instead of source code
+
+# Build a shared library(DLL)
+SharedLibrary('my_library', ['lib1.c', 'lib2.c', 'lib3.c'])
+
+# Link an existing library to a program
+Library('my_library', ['lib1.c', 'lib2.c', 'lib3.c'])
+Program('my_program', LIBS=['my_library'], LIBPATH=['/path/to/library'])
+
+# Builder methods identify the target files that are built
+main1 = Object('main1.c', CCFLAGS='-DMAIN1')
+main2 = Object('main2.c', CCFLAGS='-DMAIN2')
+Program(['main1.o', 'main2.o']) # This isn't portable. Object files on Linux are .o but on Windows .obj
+Program(main1 + main2) # This is portable again (List concatenation syntax because these are actually lists)
+
+# Get the Path from a Node
+env = Environment(VAR="value")
+n = File("foo.c")
+print(env.GetBuildPath([n, "sub/dir/$VAR"]))
+
+# CPPPATH Construction Variable for implicit dependencies from .h or .c files
+Program('main.c', CPPPATH='/path/to/dependency.h')
+
+# To specify explicit dependencies use Depends
+main1 = Program('main1.c')
+Depends(main1, 'dependency.c')
+
+# To explicitly ALWAYS build a file
+main1 = Program('main1.c')
+AlwaysBuild(main1.c) # Will always rebuilt, even if no files changes
+
+# Get host environment variables
+import os
+print("Shell is", os.environ["SHELL"])
+
+# Creating your build environment
+env = Environment(CC='gcc', CCFLAGS='-02')
+env.Program('main.c')

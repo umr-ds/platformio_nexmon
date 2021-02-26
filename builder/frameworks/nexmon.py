@@ -36,41 +36,38 @@ assert isdir(FRAMEWORK_DIR)
 
 mcu = env.BoardConfig().get("build.mcu", "") # not yet needed but nice to have for when multiple boards are implemented
 
+env.Replace(
+    AR=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-ar"),
+    AS=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-as"),
+    CC=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-gcc"),
+    CXX="arm-none-eabi-g++",
+    GDB="arm-none-eabi-gdb",
+    OBJCOPY=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-objcopy"),
+    RANLIB=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-ranlib"),
+    SIZETOOL=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-size"),
+)
+
 env.Append(
-    ASFLAGS=["-x", "assembler-with-cpp"],
+    ASFLAGS=["-x"],
     CFLAGS=["-std=gnu11"],
-    CXXFLAGS=[
-        "-std=gnu++14",
-        "-fno-threadsafe-statics",
-        "-fno-rtti",
-        "-fno-exceptions",
-        "-fno-use-cxa-atexit",
-    ],
     CCFLAGS=[
         "-Os",  # optimize for size
         "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-        "-mthumb",
-        "-ffunction-sections",  # place each function in its own section
-        "-fdata-sections",
-        "-Wall",
-        "-nostdlib",
-        "--param",
-        "max-inline-insns-single=500",
     ],
     CPPPATH=[
         join(FRAMEWORK_DIR, "buildtools", "b43", "assembler"),
         join(FRAMEWORK_DIR, "buildtools", "b43", "disassembler"),
         join(FRAMEWORK_DIR, "buildtools", "b43", "fwcutter"),
         join(FRAMEWORK_DIR, "buildtools", "b43", "ssb_sprom"),
-        #join(FRAMEWORK_DIR, "buildtools", "b43", "debug", "include"), Skip adding debug tools for now
+        join(FRAMEWORK_DIR, "buildtools", "b43", "debug", "include"), 
         join(FRAMEWORK_DIR, "buildtools", "b43-v2", "assembler"),
         join(FRAMEWORK_DIR, "buildtools", "b43-v2", "disassembler"),
-        #join(FRAMEWORK_DIR, "buildtools", "b43-v2", "debug", "include"), Skip adding debug tools for now
+        join(FRAMEWORK_DIR, "buildtools", "b43-v2", "debug", "include"), 
         join(FRAMEWORK_DIR, "buildtools", "b43-v3", "assembler"),
         join(FRAMEWORK_DIR, "buildtools", "b43-v3", "disassembler"),
         join(FRAMEWORK_DIR, "buildtools", "b43-v3", "fwcutter"),
         join(FRAMEWORK_DIR, "buildtools", "b43-v3", "ssb_sprom"),
-        #join(FRAMEWORK_DIR, "buildtools", "b43-v3", "debug", "include"), Skip adding debug tools for now
+        join(FRAMEWORK_DIR, "buildtools", "b43-v3", "debug", "include"), 
         join(FRAMEWORK_DIR, "buildtools", "flash_patch_extractor"),
         join(FRAMEWORK_DIR, "buildtools", "flash_patch_extractor", "darm"),
         join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "arm-none-eabi", "include"),
@@ -121,3 +118,4 @@ env.Append(
         "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board.get("upload.maximum_ram_size"),
     ],
 )
+print("Test")
