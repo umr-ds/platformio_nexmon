@@ -37,14 +37,13 @@ assert isdir(FRAMEWORK_DIR)
 mcu = env.BoardConfig().get("build.mcu", "") # not yet needed but nice to have for when multiple boards are implemented
 
 env.Replace(
-    AR=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-ar"),
-    AS=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-as"),
-    CC=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-gcc"),
-    CXX="arm-none-eabi-g++",
-    GDB="arm-none-eabi-gdb",
-    OBJCOPY=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-objcopy"),
-    RANLIB=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-ranlib"),
-    SIZETOOL=join(FRAMEWORK_DIR, "buildtools", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin", "arm-none-eabi-size"),
+    AR="arm-none-eabi-ar",
+    AS="arm-none-eabi-as",
+    CC="arm-none-eabi-gcc",                  # Currently using toolchain-gccarmnoneeabi as host for nexmon specific compiler
+    CXX="arm-none-eabi-cpp",
+    OBJCOPY="arm-none-eabi-objcopy",
+    RANLIB="arm-none-eabi-ranlib",
+    SIZETOOL="arm-none-eabi-size",
 )
 
 env.Append(
