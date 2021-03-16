@@ -1,0 +1,18 @@
+{
+    "build": {
+        "core": "arm",
+        "cpu": "krait-400",
+        "f_cpu": "2300000000L",
+        "mcu": "bcm4339"
+    },
+    "frameworks": [
+        "mbed"
+    ],
+    "name": "Nexus 5 Nexmon",
+    "upload": {
+        "maximum_ram_size": 2147483648,
+        "maximum_size": 2147483648
+    },
+    "url": "https://www.qualcomm.com/media/documents/files/snapdragon-800-product-brief.pdf",
+    "vendor": "Qualcomm"
+}
