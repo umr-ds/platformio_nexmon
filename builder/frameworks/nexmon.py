@@ -24,7 +24,7 @@ https://github.com/seemoo-lab/nexmon
 
 from os.path import dirname, isfile, isdir, join
 from subprocess import check_output
-from SCons.Script import DefaultEnvironment, PackageVariable, SConscript
+from SCons.Script import DefaultEnvironment, SConscript, Export
 import glob
 
 env = DefaultEnvironment()
@@ -61,7 +61,6 @@ if HOSTUNAME in "Darwin":
 
     cc_list = glob.glob(pathname=join(cc_path, "arm-none-eabi-*"))
     cc_list.sort()
-    print(cc_list)
 
     raise NotImplementedError
 
@@ -71,7 +70,6 @@ elif HOSTUNAME in "Linux" and PLATFORMUNAME in "x86_64":
 
     cc_list = glob.glob(pathname=join(cc_path, "arm-none-eabi-*"))
     cc_list.sort()
-    print(cc_list)
 
     env.Replace(
         ADDR2LINE=cc_list[0],
@@ -118,44 +116,15 @@ else:
     raise NotImplementedError
 
 env.Append(
-    ASFLAGS=["-x"],
-    CFLAGS=["-std=gnu11"],
     CCFLAGS=[
-        "-Os",  # optimize for size
         "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-    ],
-    CPPPATH=[
-        join(FRAMEWORK_DIR, "buildtools", "b43", "assembler"),
-        join(FRAMEWORK_DIR, "buildtools", "b43", "disassembler"),
-        join(FRAMEWORK_DIR, "buildtools", "b43", "fwcutter"),
-        join(FRAMEWORK_DIR, "buildtools", "b43", "ssb_sprom"),
-        join(FRAMEWORK_DIR, "buildtools", "b43-v2", "assembler"),
-        join(FRAMEWORK_DIR, "buildtools", "b43-v2", "disassembler"),
-        join(FRAMEWORK_DIR, "buildtools", "b43-v3", "assembler"),
-        join(FRAMEWORK_DIR, "buildtools", "b43-v3", "disassembler"),
-        join(FRAMEWORK_DIR, "buildtools", "b43-v3", "fwcutter"),
-        join(FRAMEWORK_DIR, "buildtools", "b43-v3", "ssb_sprom"),
-        join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor"),
-        join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor", "darm"),
-        join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"),
-        join(FRAMEWORK_DIR, "firmwares", "bcm4339"),
-        join(FRAMEWORK_DIR, "firmwares", "bcm4339", "6_37_34_43"),
-        join(FRAMEWORK_DIR, "patches", "bcm4339", "6_37_34_43", "anti_broadpwn", "src"),
-        join(FRAMEWORK_DIR, "patches", "bcm4339", "6_37_34_43", "nexmon", "include"),
-        join(FRAMEWORK_DIR, "patches", "bcm4339", "6_37_34_43", "nexmon", "src"),
-        join(FRAMEWORK_DIR, "patches", "bcm4339", "6_37_34_43", "rom_extraction", "src"),
-    ],
-    LINKFLAGS=[
-        "-Os",
-        "-mthumb",
-        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-        "--specs=nano.specs",
-        "-Wl,--gc-sections,--relax",
-        "-Wl,--check-sections",
-        "-Wl,--entry=Reset_Handler",
-        "-Wl,--unresolved-symbols=report-all",
-        "-Wl,--warn-common",
-        "-Wl,--defsym=LD_MAX_SIZE=%d" % board.get("upload.maximum_size"),
-        "-Wl,--defsym=LD_MAX_DATA_SIZE=%d" % board.get("upload.maximum_ram_size"),
     ],
 )
+
+Export('env', "FRAMEWORK_DIR")
+
+SConscript('b43.py')
+SConscript('b43-v2.py')
+SConscript('b43-v3.py')
+SConscript('flash_patch_extractor.py')
+SConscript('ucode_extractor.py')
