@@ -123,8 +123,8 @@ env.Append(
 
 Export('env', "FRAMEWORK_DIR")
 
-SConscript('b43.py')
-SConscript('b43-v2.py')
-SConscript('b43-v3.py')
-SConscript('flash_patch_extractor.py')
-SConscript('ucode_extractor.py')
+#SConscript('b43.py')
+#SConscript('b43-v2.py')
+#SConscript('b43-v3.py')
+#SConscript('flash_patch_extractor.py')
+#SConscript('ucode_extractor.py')

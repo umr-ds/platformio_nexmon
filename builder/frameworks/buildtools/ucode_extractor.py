@@ -15,4 +15,4 @@ env.Append(
     ],
 )
 
-env.BuildProgram(join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"))
+#env.BuildProgram(join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"))
