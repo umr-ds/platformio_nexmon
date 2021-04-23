@@ -123,8 +123,16 @@ env.Append(
 
 Export('env', "FRAMEWORK_DIR")
 
-#SConscript('b43.py')
-#SConscript('b43-v2.py')
-#SConscript('b43-v3.py')
-#SConscript('flash_patch_extractor.py')
-#SConscript('ucode_extractor.py')
+SConscript(['buildtools/ucode_extractor.py',
+            'buildtools/flash_patch_extractor.py', 
+            'buildtools/b43-v3/b43-v3-assembler.py', 
+            'buildtools/b43-v3/b43-v3-disassembler.py',
+            'buildtools/b43-v3/b43-v3-fwcutter.py',
+            'buildtools/b43-v3/b43-v3-ssb_sprom.py',
+            'buildtools/b43-v2/b43-v2-assembler.py',
+            'buildtools/b43-v2/b43-v2-disassembler.py',
+            'buildtools/b43/b43-assembler.py',
+            'buildtools/b43/b43-disassembler.py',
+            'buildtools/b43/b43-fwcutter.py',
+            'buildtools/b43/b43-ssb_sprom.py',], 
+            exports=['env', 'FRAMEWORK_DIR'])

@@ -1,6 +1,7 @@
-from builder.main import FRAMEWORK_DIR
 from os.path import join
 Import('env', "FRAMEWORK_DIR")
+
+print("Configuring ucode extractor...")
 
 env.Append(
     CCFLAGS=[
