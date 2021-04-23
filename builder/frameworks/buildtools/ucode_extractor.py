@@ -13,7 +13,8 @@ env.Append(
     ],
     CPPPATH=[
         join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"),
+        join(FRAMEWORK_DIR, "utilities", "libargp")
     ],
 )
 
-#env.BuildProgram(join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"))
+env.BuildSources(join("$BUILD_DIR", "Framework-Nexmon", "ucode_extractor"), join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"))

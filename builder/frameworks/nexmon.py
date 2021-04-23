@@ -121,6 +121,10 @@ env.Append(
     ],
 )
 
+env.Append(
+    LIBPATH = "/home/chris/Programming/Repositories/nexmon/utilities"
+)
+
 Export('env', "FRAMEWORK_DIR")
 
 SConscript(['buildtools/ucode_extractor.py',
