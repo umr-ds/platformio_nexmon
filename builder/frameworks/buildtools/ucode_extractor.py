@@ -1,4 +1,4 @@
-from os.path import join
+import os.path
 Import('env', "FRAMEWORK_DIR")
 
 print("Compiling ucode extractor...")
@@ -12,9 +12,8 @@ env.Append(
         "-D_BSD_SOURCE",
     ],
     CPPPATH=[
-        join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"),
-        join(FRAMEWORK_DIR, "utilities", "libargp")
+        os.path.join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"),
     ],
 )
 
-env.BuildSources(join("$BUILD_DIR", "Framework-Nexmon", "ucode_extractor"), join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"))
+env.BuildSources(os.path.join("$BUILD_DIR", "Framework-Nexmon", "ucode_extractor"), os.path.join(FRAMEWORK_DIR, "buildtools", "ucode_extractor"))

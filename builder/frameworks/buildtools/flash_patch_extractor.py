@@ -1,12 +1,12 @@
-from os.path import join
+import os.path
 Import('env', "FRAMEWORK_DIR")
 
 print("Compiling flash patch extractor...")
 
 env.Append(
     CPPPATH=[
-        join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor"),
-        join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor", "darm"),
+        os.path.join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor"),
+        os.path.join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor", "darm"),
     ],
 )
 
@@ -21,5 +21,5 @@ env.Replace(
     ]
 )
 
-env.BuildSources(join("$BUILD_DIR", "Framework-Nexmon", "flash_patch_extractor", "darm"), join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor", "darm"))
-env.BuildSources(join("$BUILD_DIR", "Framework-Nexmon", "flash_patch_extractor"), join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor"))
+env.BuildSources(os.path.join("$BUILD_DIR", "Framework-Nexmon", "flash_patch_extractor", "darm"), os.path.join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor", "darm"))
+env.BuildSources(os.path.join("$BUILD_DIR", "Framework-Nexmon", "flash_patch_extractor"), os.path.join(FRAMEWORK_DIR, "buildtools", "flash_path_extractor"))

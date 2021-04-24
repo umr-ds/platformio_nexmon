@@ -94,7 +94,7 @@ Depends(main1, 'dependency.c')
 
 # To explicitly ALWAYS build a file
 main1 = Program('main1.c')
-AlwaysBuild(main1.c) # Will always rebuilt, even if no files changes
+AlwaysBuild(main1) # Will always rebuilt, even if no files changes
 
 # Get host environment variables
 import os

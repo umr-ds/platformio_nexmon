@@ -22,8 +22,9 @@ to enable monitor mode with radiotap headers and frame injection.
 https://github.com/seemoo-lab/nexmon
 """
 
-from os.path import dirname, isfile, isdir, join
-from subprocess import check_output
+import os.path
+import os
+import subprocess
 from SCons.Script import DefaultEnvironment, SConscript, Export
 import glob
 
@@ -33,16 +34,16 @@ board = env.BoardConfig()
 
 # Spoofing Nexmon as mbed currently to skip having to publish it as a package
 FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
-PACKAGE_DIR = dirname(FRAMEWORK_DIR)
-assert isdir(FRAMEWORK_DIR)
-assert isdir(PACKAGE_DIR)
+PACKAGE_DIR = os.path.dirname(FRAMEWORK_DIR)
+assert os.path.isdir(FRAMEWORK_DIR)
+assert os.path.isdir(PACKAGE_DIR)
 
 # not yet needed but nice to have for when multiple boards are implemented
 mcu = env.BoardConfig().get("build.mcu", "")
 
-# Add environment variables for the nexmon build process
-HOSTUNAME = check_output(["uname", "-s"]).decode(encoding="utf-8").replace("\n", "")
-PLATFORMUNAME = check_output(["uname", "-m"]).decode(encoding="utf-8").replace("\n", "")
+# Get environment variables for the nexmon build process
+HOSTUNAME = subprocess.check_output(["uname", "-s"]).decode(encoding="utf-8").replace("\n", "")
+PLATFORMUNAME = subprocess.check_output(["uname", "-m"]).decode(encoding="utf-8").replace("\n", "")
 
 env.Append(
     ARCH="arm",
@@ -55,88 +56,45 @@ env.Append(
     NEXMON_SETUP_ENV="1"
 )
 
+# Default compiler is currently for Linux x86_64
+
 if HOSTUNAME in "Darwin":
-    cc_path = join(PACKAGE_DIR, "toolchain-gccarmnoneeabi", "gcc-arm-none-eabi-5_4-2016q2-osx", "bin")
-    assert isdir(cc_path)
-
-    cc_list = glob.glob(pathname=join(cc_path, "arm-none-eabi-*"))
-    cc_list.sort()
-
+    # Set Darwin specific compiler here
     raise NotImplementedError
-
-elif HOSTUNAME in "Linux" and PLATFORMUNAME in "x86_64":
-    cc_path = join(PACKAGE_DIR, "toolchain-gccarmnoneeabi", "gcc-arm-none-eabi-5_4-2016q2-linux-x86", "bin")
-    assert isdir(cc_path)
-
-    cc_list = glob.glob(pathname=join(cc_path, "arm-none-eabi-*"))
-    cc_list.sort()
-
-    env.Replace(
-        ADDR2LINE=cc_list[0],
-        AR=cc_list[1],
-        AS=cc_list[2],
-        CYY=cc_list[3],
-        FILT=cc_list[4],
-        CPP=cc_list[5],
-        ELFEDIT=cc_list[6],
-        CXX=cc_list[7],
-        CC=cc_list[8],
-        CCPLUGIN=join(PACKAGE_DIR, "toolchain-gccarmnoneeabi", "gcc-nexmon-plugin", "nexmon.so"),
-        GCC=cc_list[9],
-        GCCAR=cc_list[10],
-        GCCNM=cc_list[11],
-        GCCRANLIB=cc_list[12],
-        GCOV=cc_list[13],
-        GCOVTOOL=cc_list[14],
-        GDB=cc_list[15],
-        GDBPY=cc_list[16],
-        GPROF=cc_list[17],
-        LD=cc_list[18],
-        LDBFD=cc_list[19],
-        NM=cc_list[20],
-        OBJCOPY=cc_list[21],
-        OBJDUMP=cc_list[22],
-        RANLIB=cc_list[23],
-        READELF=cc_list[24],
-        SIZETOOL=cc_list[25],
-        STRINGS=cc_list[26],
-        STRIP=cc_list[27],
-    )
-
 elif (HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l") or PLATFORMUNAME in "armv6l":
-    cc_path = join(PACKAGE_DIR, "toolchain-gccarmnoneeabi", "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l", "bin")
-    assert isdir(cc_path)
-
-    cc_list = glob.glob(pathname=join(cc_path, "arm-none-eabi-*"))
-    cc_list.sort()
-    print(cc_list)
-
-    raise NotImplementedError
-else:
+    # Set Linux crosscompiler for arm here
     raise NotImplementedError
 
 env.Append(
-    LIBPATH = join(FRAMEWORK_DIR, "utilities")
+    CCPLUGIN = os.path.join(PACKAGE_DIR, "toolchain-gccarmnoneeabi", "gcc-nexmon-plugin", "nexmon.so"),
 )
 
 Export('env', "FRAMEWORK_DIR")
 
-SConscript(['buildtools/ucode_extractor.py',
-            'buildtools/flash_patch_extractor.py', 
-            'buildtools/b43-v3/b43-v3-assembler.py', 
-            'buildtools/b43-v3/b43-v3-disassembler.py',
-            'buildtools/b43-v3/b43-v3-fwcutter.py',
-            'buildtools/b43-v3/b43-v3-ssb_sprom.py',
-            'buildtools/b43-v2/b43-v2-assembler.py',
-            'buildtools/b43-v2/b43-v2-disassembler.py',
-            'buildtools/b43/b43-assembler.py',
-            'buildtools/b43/b43-disassembler.py',
-            'buildtools/b43/b43-fwcutter.py',
-            'buildtools/b43/b43-ssb_sprom.py',], 
+
+SConscript([#'buildtools/ucode_extractor.py',
+            #'buildtools/flash_patch_extractor.py', 
+            #'buildtools/b43-v3/b43-v3-assembler.py', 
+            #'buildtools/b43-v3/b43-v3-disassembler.py',
+            #'buildtools/b43-v3/b43-v3-fwcutter.py',
+            #'buildtools/b43-v3/b43-v3-ssb_sprom.py',
+            #'buildtools/b43-v2/b43-v2-assembler.py',
+            #'buildtools/b43-v2/b43-v2-disassembler.py',
+            #'buildtools/b43/b43-assembler.py',
+            #'buildtools/b43/b43-disassembler.py',
+            #'buildtools/b43/b43-fwcutter.py',
+            #'buildtools/b43/b43-ssb_sprom.py',
+            ], 
             exports=['env', 'FRAMEWORK_DIR'])
             
+
 env.Append(
     CCFLAGS=[
         "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
     ],
 )
+
+def PreCompileDependencies():
+    rc = subprocess.Popen(["make", "-s"], cwd=os.path.join(FRAMEWORK_DIR, "buildtools", "b43", "assembler"))
+
+PreCompileDependencies()
