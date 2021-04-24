@@ -116,13 +116,7 @@ else:
     raise NotImplementedError
 
 env.Append(
-    CCFLAGS=[
-        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-    ],
-)
-
-env.Append(
-    LIBPATH = "/home/chris/Programming/Repositories/nexmon/utilities"
+    LIBPATH = join(FRAMEWORK_DIR, "utilities")
 )
 
 Export('env', "FRAMEWORK_DIR")
@@ -140,3 +134,9 @@ SConscript(['buildtools/ucode_extractor.py',
             'buildtools/b43/b43-fwcutter.py',
             'buildtools/b43/b43-ssb_sprom.py',], 
             exports=['env', 'FRAMEWORK_DIR'])
+            
+env.Append(
+    CCFLAGS=[
+        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+    ],
+)

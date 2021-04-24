@@ -1,10 +1,10 @@
 from os.path import join
 Import('env', "FRAMEWORK_DIR")
 
-print("Configuring ucode extractor...")
+print("Compiling ucode extractor...")
 
 env.Append(
-    CCFLAGS=[
+    CFLAGS=[
         "-std=c99",
         "-Wall",
         "-Wno-unused-result",
