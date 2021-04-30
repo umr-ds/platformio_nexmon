@@ -72,8 +72,8 @@ env.Append(
 Export('env', "FRAMEWORK_DIR")
 
 
-SConscript([#'buildtools/ucode_extractor.py',
-            #'buildtools/flash_patch_extractor.py', 
+#SConscript(['buildtools/ucode_extractor.py',
+#            'buildtools/flash_patch_extractor.py', 
             #'buildtools/b43-v3/b43-v3-assembler.py', 
             #'buildtools/b43-v3/b43-v3-disassembler.py',
             #'buildtools/b43-v3/b43-v3-fwcutter.py',
@@ -84,17 +84,13 @@ SConscript([#'buildtools/ucode_extractor.py',
             #'buildtools/b43/b43-disassembler.py',
             #'buildtools/b43/b43-fwcutter.py',
             #'buildtools/b43/b43-ssb_sprom.py',
-            ], 
-            exports=['env', 'FRAMEWORK_DIR'])
+#            ], 
+#            exports=['env', 'FRAMEWORK_DIR'])
             
 
-env.Append(
+env.Replace(
     CCFLAGS=[
         "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
     ],
 )
-
-def PreCompileDependencies():
-    rc = subprocess.Popen(["make", "-s"], cwd=os.path.join(FRAMEWORK_DIR, "buildtools", "b43", "assembler"))
-
-PreCompileDependencies()
+rc = subprocess.Popen(["make", "-s"], cwd=os.path.join(FRAMEWORK_DIR, "buildtools"))

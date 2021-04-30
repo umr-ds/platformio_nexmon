@@ -45,6 +45,12 @@ env.Replace(
     PROGSUFFIX=".elf"
 )
 
+env.Replace(
+    CCFLAGS=[
+        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+    ],
+)
+
 # Allow user to override via pre:script
 if env.get("PROGNAME", "program") == "program":
     env.Replace(PROGNAME="firmware")
