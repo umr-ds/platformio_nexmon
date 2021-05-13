@@ -20,12 +20,11 @@ from platform import system
 from platformio.managers.platform import PlatformBase
 from platformio.util import get_systype
 
-class CypressPlatform(PlatformBase):
 
+class CypressPlatform(PlatformBase):
     def configure_default_packages(self, variables, targets):
         board = variables.get("board")
         board_config = self.board_config(variables.get("board"))
         frameworks = variables.get("pioframework", [])
 
-        return PlatformBase.configure_default_packages(self, variables,
-                                                       targets)
+        return PlatformBase.configure_default_packages(self, variables, targets)

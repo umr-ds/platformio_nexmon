@@ -22,11 +22,9 @@ to enable monitor mode with radiotap headers and frame injection.
 https://github.com/seemoo-lab/nexmon
 """
 
-import os.path
 import os
 import subprocess
-from SCons.Script import DefaultEnvironment, SConscript, Export
-import glob
+from SCons.Script import DefaultEnvironment
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -38,59 +36,50 @@ PACKAGE_DIR = os.path.dirname(FRAMEWORK_DIR)
 assert os.path.isdir(FRAMEWORK_DIR)
 assert os.path.isdir(PACKAGE_DIR)
 
-# not yet needed but nice to have for when multiple boards are implemented
-mcu = env.BoardConfig().get("build.mcu", "")
+# needed for differentiating between multiple chips (bcm433, bcm4339...)
+mcu = env.BoardConfig().get("build.mcu")
+cpu = env.BoardConfig().get("build.cpu")
 
 # Get environment variables for the nexmon build process
-HOSTUNAME = subprocess.check_output(["uname", "-s"]).decode(encoding="utf-8").replace("\n", "")
-PLATFORMUNAME = subprocess.check_output(["uname", "-m"]).decode(encoding="utf-8").replace("\n", "")
-
-env.Append(
-    ARCH="arm",
-    SUBARCH="arm",
-    KERNEL="kernel7",
-    HOSTUNAME=HOSTUNAME,
-    PLATFORMUNAME=PLATFORMUNAME,
-    NEXMON_ROOT=FRAMEWORK_DIR,
-    Q="@",
-    NEXMON_SETUP_ENV="1"
+HOSTUNAME = (
+    subprocess.check_output(["uname", "-s"]).decode(encoding="utf-8").replace("\n", "")
+)
+PLATFORMUNAME = (
+    subprocess.check_output(["uname", "-m"]).decode(encoding="utf-8").replace("\n", "")
 )
 
 # Default compiler is currently for Linux x86_64
-
-if HOSTUNAME in "Darwin":
-    # Set Darwin specific compiler here
-    raise NotImplementedError
-elif (HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l") or PLATFORMUNAME in "armv6l":
-    # Set Linux crosscompiler for arm here
+if (HOSTUNAME in "Darwin") or (
+    (HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l") or PLATFORMUNAME in "armv6l"
+):
     raise NotImplementedError
 
-env.Append(
-    CCPLUGIN = os.path.join(PACKAGE_DIR, "toolchain-gccarmnoneeabi", "gcc-nexmon-plugin", "nexmon.so"),
+# Setting up the nexmon build environment
+os.environ["ARCH"] = "arm"
+os.environ["SUBARCH"] = "arm"
+os.environ["KERNEL"] = "kernel7"
+os.environ["HOSTUNAME"] = HOSTUNAME
+os.environ["PLATFORMUNAME"] = PLATFORMUNAME
+os.environ["NEXMON_ROOT"] = FRAMEWORK_DIR
+os.environ["CC"] = os.path.join(
+    PACKAGE_DIR,
+    "Nexmon-Toolchains",
+    "gcc-arm-none-eabi-5_4-2016q2-linux-x86",
+    "bin",
+    "arm-none-eabi-",
 )
-
-Export('env', "FRAMEWORK_DIR")
-
-
-#SConscript(['buildtools/ucode_extractor.py',
-#            'buildtools/flash_patch_extractor.py', 
-            #'buildtools/b43-v3/b43-v3-assembler.py', 
-            #'buildtools/b43-v3/b43-v3-disassembler.py',
-            #'buildtools/b43-v3/b43-v3-fwcutter.py',
-            #'buildtools/b43-v3/b43-v3-ssb_sprom.py',
-            #'buildtools/b43-v2/b43-v2-assembler.py',
-            #'buildtools/b43-v2/b43-v2-disassembler.py',
-            #'buildtools/b43/b43-assembler.py',
-            #'buildtools/b43/b43-disassembler.py',
-            #'buildtools/b43/b43-fwcutter.py',
-            #'buildtools/b43/b43-ssb_sprom.py',
-#            ], 
-#            exports=['env', 'FRAMEWORK_DIR'])
-            
-
-env.Replace(
-    CCFLAGS=[
-        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-    ],
+os.environ["CCPLUGIN"] = os.path.join(
+    PACKAGE_DIR, "Nexmon-Toolchains", "gcc-nexmon-plugin", "nexmon.so"
 )
-rc = subprocess.Popen(["make", "-s"], cwd=os.path.join(FRAMEWORK_DIR, "buildtools"))
+os.environ["ZLIBFLATE"] = "zlib-flate -compress"
+os.environ["Q"] = "@"
+os.environ["NEXMON_SETUP_ENV"] = "1"
+
+
+# Build buildtools and firmware files
+rc = subprocess.Popen(["make", "-s"], cwd=FRAMEWORK_DIR)
+# Build patched firmware
+rc1 = subprocess.Popen(
+    ["make", "-s"],
+    cwd=os.path.join(FRAMEWORK_DIR, "patches", mcu, "6_37_34_43", "nexmon"),
+)

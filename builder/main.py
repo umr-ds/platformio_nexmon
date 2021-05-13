@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-from platform import system
-from os import makedirs
-from os.path import basename, isdir, join
+from os.path import join
 
-from SCons.Script import (ARGUMENTS, COMMAND_LINE_TARGETS, AlwaysBuild,
-                          Builder, Default, DefaultEnvironment)
+from SCons.Script import (
+    COMMAND_LINE_TARGETS,
+    AlwaysBuild,
+    Builder,
+    Default,
+    DefaultEnvironment,
+)
 
 
 env = DefaultEnvironment()
@@ -29,20 +31,20 @@ FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
 env.Replace(
     AR="arm-none-eabi-ar",
     AS="arm-none-eabi-as",
-    CC="arm-none-eabi-gcc",                  # Currently using toolchain-gccarmnoneeabi as host for nexmon specific compiler
+    CC="arm-none-eabi-gcc",
+    CCFLAGS=[
+        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+    ],
     CXX="arm-none-eabi-cpp",
     OBJCOPY="arm-none-eabi-objcopy",
     RANLIB="arm-none-eabi-ranlib",
     SIZETOOL="arm-none-eabi-size",
-
     ARFLAGS=["rc"],
-
     SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx)\s+(\d+).*",
     SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
     SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
-    SIZEPRINTCMD='$SIZETOOL -B -d $SOURCES',
-
-    PROGSUFFIX=".elf"
+    SIZEPRINTCMD="$SIZETOOL -B -d $SOURCES",
+    PROGSUFFIX=".elf",
 )
 
 env.Replace(
@@ -55,30 +57,26 @@ env.Replace(
 if env.get("PROGNAME", "program") == "program":
     env.Replace(PROGNAME="firmware")
 
+print(env["PROJECT_TARGET_DIR"])
+
 env.Append(
     BUILDERS=dict(
         ElfToBin=Builder(
-            action=env.VerboseAction(" ".join([
-                "$OBJCOPY",
-                "-O",
-                "binary",
-                "$SOURCES",
-                "$TARGET"
-            ]), "Building $TARGET"),
-            suffix=".bin"
+            action=env.VerboseAction(
+                " ".join(["$OBJCOPY", "-O", "binary", "$SOURCES", "$TARGET"]),
+                "Building $TARGET",
+            ),
+            suffix=".bin",
         ),
         ElfToHex=Builder(
-            action=env.VerboseAction(" ".join([
-                "$OBJCOPY",
-                "-O",
-                "ihex",
-                "-R",
-                ".eeprom",
-                "$SOURCES",
-                "$TARGET"
-            ]), "Building $TARGET"),
-            suffix=".hex"
-        )
+            action=env.VerboseAction(
+                " ".join(
+                    ["$OBJCOPY", "-O", "ihex", "-R", ".eeprom", "$SOURCES", "$TARGET"]
+                ),
+                "Building $TARGET",
+            ),
+            suffix=".hex",
+        ),
     )
 )
 
@@ -100,10 +98,16 @@ target_buildprog = env.Alias("buildprog", target_firm, target_firm)
 #
 # Target: Print binary size
 #
+target_elf = join(
+    FRAMEWORK_DIR, "patches", "bcm4339", "6_37_34_43", "nexmon", "gen", "patch.elf"
+)
+target_firm = join(
+    FRAMEWORK_DIR, "patches", "bcm4339", "6_37_34_43", "nexmon", "fw_bcmdhd.bin"
+)
 
 target_size = env.Alias(
-    "size", target_elf,
-    env.VerboseAction("$SIZEPRINTCMD", "Calculating size $SOURCE"))
+    "size", target_elf, env.VerboseAction("$SIZEPRINTCMD", "Calculating size $SOURCE")
+)
 AlwaysBuild(target_size)
 
 #
@@ -111,8 +115,10 @@ AlwaysBuild(target_size)
 #
 
 if any("-Wl,-T" in f for f in env.get("LINKFLAGS", [])):
-    print("Warning! '-Wl,-T' option for specifying linker scripts is deprecated. "
-          "Please use 'board_build.ldscript' option in your 'platformio.ini' file.")
+    print(
+        "Warning! '-Wl,-T' option for specifying linker scripts is deprecated. "
+        "Please use 'board_build.ldscript' option in your 'platformio.ini' file."
+    )
 
 #
 # Default targets
