@@ -23,6 +23,7 @@ https://github.com/seemoo-lab/nexmon
 """
 
 import os
+import git
 import subprocess
 from SCons.Script import DefaultEnvironment
 
@@ -35,6 +36,11 @@ FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
 PACKAGE_DIR = os.path.dirname(FRAMEWORK_DIR)
 assert os.path.isdir(FRAMEWORK_DIR)
 assert os.path.isdir(PACKAGE_DIR)
+
+file = os.path.join(PACKAGE_DIR, "test.txt")
+open(file, 'a').close()
+if not os.path.isdir(os.path.join(PACKAGE_DIR, "nexmon")):
+    git.Repo.clone_from("https://github.com/seemoo-lab/nexmon", to_path=os.path.join(PACKAGE_DIR, "nexmon"))
 
 # needed for differentiating between multiple chips (bcm433, bcm4339...)
 mcu = env.BoardConfig().get("build.mcu")
@@ -62,8 +68,8 @@ os.environ["HOSTUNAME"] = HOSTUNAME
 os.environ["PLATFORMUNAME"] = PLATFORMUNAME
 os.environ["NEXMON_ROOT"] = FRAMEWORK_DIR
 os.environ["CC"] = os.path.join(
-    PACKAGE_DIR,
-    "Nexmon-Toolchains",
+    FRAMEWORK_DIR,
+    "buildtools",
     "gcc-arm-none-eabi-5_4-2016q2-linux-x86",
     "bin",
     "arm-none-eabi-",
@@ -75,11 +81,22 @@ os.environ["ZLIBFLATE"] = "zlib-flate -compress"
 os.environ["Q"] = "@"
 os.environ["NEXMON_SETUP_ENV"] = "1"
 
-
+patch_path = os.path.join(FRAMEWORK_DIR, "patches", mcu, "6_37_34_43", "nexmon")
 # Build buildtools and firmware files
 rc = subprocess.Popen(["make", "-s"], cwd=FRAMEWORK_DIR)
 # Build patched firmware
-rc1 = subprocess.Popen(
+"""rc1 = subprocess.Popen(
     ["make", "-s"],
-    cwd=os.path.join(FRAMEWORK_DIR, "patches", mcu, "6_37_34_43", "nexmon"),
+    cwd=patch_path,
 )
+# Backup current firmware
+rc2 = subprocess.Popen(
+    ["make", "backup-firmware"],
+    cwd=patch_path
+)
+# Install new firmware
+rc3 = subprocess.Popen(
+    ["make", "install-firmware"],
+    cwd=patch_path
+)
+"""

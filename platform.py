@@ -14,6 +14,7 @@
 
 import json
 import os
+import git
 
 from platform import system
 

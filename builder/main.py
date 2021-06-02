@@ -57,8 +57,6 @@ env.Replace(
 if env.get("PROGNAME", "program") == "program":
     env.Replace(PROGNAME="firmware")
 
-print(env["PROJECT_TARGET_DIR"])
-
 env.Append(
     BUILDERS=dict(
         ElfToBin=Builder(
