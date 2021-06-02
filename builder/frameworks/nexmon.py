@@ -22,29 +22,66 @@ to enable monitor mode with radiotap headers and frame injection.
 https://github.com/seemoo-lab/nexmon
 """
 
+from genericpath import isdir, isfile
 import os
 import git
 import subprocess
+import shutil
+import glob
 from SCons.Script import DefaultEnvironment
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
 board = env.BoardConfig()
+# needed for differentiating between multiple chips (bcm4330, bcm4339...)
+mcu = board.get("build.mcu")
+cpu = board.get("build.cpu")
 
 # Spoofing Nexmon as mbed currently to skip having to publish it as a package
 FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
 PACKAGE_DIR = os.path.dirname(FRAMEWORK_DIR)
+NEXMON_DIR = os.path.join(PACKAGE_DIR, "nexmon")
+BUILDTOOLS = os.path.join(NEXMON_DIR, "buildtools")
+FIRMWARES = os.path.join(NEXMON_DIR, "firmwares")
+PROJECT_DIR = env["PROJECT_DIR"]
+BUILD_DIR = env["PROJECT_BUILD_DIR"]
+SRC_DIR = os.path.join(PROJECT_DIR, "src")
+LIB_DIR = os.path.join(PROJECT_DIR, "lib")
+PROJECT_NEXMON_DIR = os.path.join(LIB_DIR, "nexmon")
+
 assert os.path.isdir(FRAMEWORK_DIR)
 assert os.path.isdir(PACKAGE_DIR)
+assert os.path.isdir(PROJECT_DIR)
+assert os.path.isdir(BUILD_DIR)
+assert os.path.isdir(SRC_DIR)
+assert os.path.isdir(LIB_DIR)
 
 file = os.path.join(PACKAGE_DIR, "test.txt")
 open(file, 'a').close()
-if not os.path.isdir(os.path.join(PACKAGE_DIR, "nexmon")):
-    git.Repo.clone_from("https://github.com/seemoo-lab/nexmon", to_path=os.path.join(PACKAGE_DIR, "nexmon"))
+if not os.path.isdir(NEXMON_DIR):
+    git.Repo.clone_from("https://github.com/seemoo-lab/nexmon", to_path=NEXMON_DIR)
 
-# needed for differentiating between multiple chips (bcm433, bcm4339...)
-mcu = env.BoardConfig().get("build.mcu")
-cpu = env.BoardConfig().get("build.cpu")
+print(BUILDTOOLS)
+print(SRC_DIR)
+
+if isfile(os.path.join(SRC_DIR, "main.cpp")):
+    os.remove(os.path.join(SRC_DIR, file))
+
+if not isfile(os.path.join(SRC_DIR, "main.c")):
+    main = open(os.path.join(SRC_DIR, "main.c"), mode="a")
+    main.write("// Entry point of your custom patch")
+    main.close()
+
+if not isdir(PROJECT_NEXMON_DIR):
+    os.mkdir(os.path.join(LIB_DIR, "nexmon"))
+    shutil.copytree(BUILDTOOLS, os.path.join(PROJECT_NEXMON_DIR, "buildtools"))
+    shutil.copytree(os.path.join(FIRMWARES, f"{mcu}"), os.path.join(PROJECT_NEXMON_DIR, "firmwares", f"{mcu}"))
+    shutil.copy(os.path.join(FIRMWARES, "Makefile"), os.path.join(PROJECT_NEXMON_DIR, "firmwares"))
+    shutil.copy(os.path.join(NEXMON_DIR, "Makefile"), PROJECT_NEXMON_DIR)
+    shutil.copytree(os.path.join(NEXMON_DIR, "patches", "common"), os.path.join(PROJECT_NEXMON_DIR, "patches", "common"))
+    shutil.copytree(os.path.join(NEXMON_DIR, "patches", "include"), os.path.join(PROJECT_NEXMON_DIR, "patches", "include"))
+    shutil.copytree(os.path.join(NEXMON_DIR, "patches", f"{mcu}"), os.path.join(PROJECT_NEXMON_DIR, "patches", f"{mcu}"))
+    
 
 # Get environment variables for the nexmon build process
 HOSTUNAME = (
@@ -66,37 +103,38 @@ os.environ["SUBARCH"] = "arm"
 os.environ["KERNEL"] = "kernel7"
 os.environ["HOSTUNAME"] = HOSTUNAME
 os.environ["PLATFORMUNAME"] = PLATFORMUNAME
-os.environ["NEXMON_ROOT"] = FRAMEWORK_DIR
+os.environ["NEXMON_ROOT"] = PROJECT_NEXMON_DIR
 os.environ["CC"] = os.path.join(
-    FRAMEWORK_DIR,
+    NEXMON_DIR,
     "buildtools",
     "gcc-arm-none-eabi-5_4-2016q2-linux-x86",
     "bin",
     "arm-none-eabi-",
 )
 os.environ["CCPLUGIN"] = os.path.join(
-    PACKAGE_DIR, "Nexmon-Toolchains", "gcc-nexmon-plugin", "nexmon.so"
+    PROJECT_NEXMON_DIR, "buildtools", "gcc-nexmon-plugin", "nexmon.so"
 )
 os.environ["ZLIBFLATE"] = "zlib-flate -compress"
 os.environ["Q"] = "@"
 os.environ["NEXMON_SETUP_ENV"] = "1"
 
-patch_path = os.path.join(FRAMEWORK_DIR, "patches", mcu, "6_37_34_43", "nexmon")
+patch_path = glob.glob(f"{PROJECT_NEXMON_DIR}/patches/{mcu}/*/nexmon")[0]
+
 # Build buildtools and firmware files
-rc = subprocess.Popen(["make", "-s"], cwd=FRAMEWORK_DIR)
+rc = subprocess.call(["make", "-s"], cwd=PROJECT_NEXMON_DIR)
 # Build patched firmware
-"""rc1 = subprocess.Popen(
+rc1 = subprocess.call(
     ["make", "-s"],
     cwd=patch_path,
 )
 # Backup current firmware
-rc2 = subprocess.Popen(
+rc2 = subprocess.call(
     ["make", "backup-firmware"],
     cwd=patch_path
 )
 # Install new firmware
-rc3 = subprocess.Popen(
+rc3 = subprocess.call(
     ["make", "install-firmware"],
     cwd=patch_path
 )
-"""
+
