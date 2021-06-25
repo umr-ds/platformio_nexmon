@@ -3,12 +3,13 @@
         "core": "arm",
         "cpu": "arm8",
         "f_cpu": "2300000000L",
-        "mcu": "bcm4339"
+        "mcu": "bcm4339",
+        "firmware": "6_37_34_43"
     },
     "frameworks": [
         "mbed"
     ],
-    "name": "Nexus 5 Nexmon",
+    "name": "Nexus 5 Nexmon 6_37_34_43",
     "upload": {
         "maximum_ram_size": 2147483648,
         "maximum_size": 2147483648

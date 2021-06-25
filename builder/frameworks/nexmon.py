@@ -36,6 +36,7 @@ board = env.BoardConfig()
 # needed for differentiating between multiple chips (bcm4330, bcm4339...)
 mcu = board.get("build.mcu")
 cpu = board.get("build.cpu")
+firmware = board.get("build.firmware")
 
 # Spoofing Nexmon as mbed currently to skip having to publish it as a package
 FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
@@ -47,7 +48,7 @@ PROJECT_DIR = env["PROJECT_DIR"]
 BUILD_DIR = env["PROJECT_BUILD_DIR"]
 SRC_DIR = os.path.join(PROJECT_DIR, "src")
 LIB_DIR = os.path.join(PROJECT_DIR, "lib")
-PROJECT_NEXMON_DIR = os.path.join(LIB_DIR, "nexmon")
+PROJECT_NEXMON_DIR = os.path.join(SRC_DIR, "nexmon")
 
 assert os.path.isdir(FRAMEWORK_DIR)
 assert os.path.isdir(PACKAGE_DIR)
@@ -56,24 +57,17 @@ assert os.path.isdir(BUILD_DIR)
 assert os.path.isdir(SRC_DIR)
 assert os.path.isdir(LIB_DIR)
 
-file = os.path.join(PACKAGE_DIR, "test.txt")
-open(file, 'a').close()
-if not os.path.isdir(NEXMON_DIR):
+# If nexmon is not found, clone it into PlatformIO's package directory
+if not isdir(NEXMON_DIR):
     git.Repo.clone_from("https://github.com/seemoo-lab/nexmon", to_path=NEXMON_DIR)
 
-print(BUILDTOOLS)
-print(SRC_DIR)
-
+# Remove the unneeded main.cpp
 if isfile(os.path.join(SRC_DIR, "main.cpp")):
-    os.remove(os.path.join(SRC_DIR, file))
+    os.remove(os.path.join(SRC_DIR, "main.cpp"))
 
-if not isfile(os.path.join(SRC_DIR, "main.c")):
-    main = open(os.path.join(SRC_DIR, "main.c"), mode="a")
-    main.write("// Entry point of your custom patch")
-    main.close()
-
+# Copy all the necessary files from nexmon to the project folder
 if not isdir(PROJECT_NEXMON_DIR):
-    os.mkdir(os.path.join(LIB_DIR, "nexmon"))
+    os.mkdir(os.path.join(SRC_DIR, "nexmon"))
     shutil.copytree(BUILDTOOLS, os.path.join(PROJECT_NEXMON_DIR, "buildtools"))
     shutil.copytree(os.path.join(FIRMWARES, f"{mcu}"), os.path.join(PROJECT_NEXMON_DIR, "firmwares", f"{mcu}"))
     shutil.copy(os.path.join(FIRMWARES, "Makefile"), os.path.join(PROJECT_NEXMON_DIR, "firmwares"))
@@ -81,9 +75,16 @@ if not isdir(PROJECT_NEXMON_DIR):
     shutil.copytree(os.path.join(NEXMON_DIR, "patches", "common"), os.path.join(PROJECT_NEXMON_DIR, "patches", "common"))
     shutil.copytree(os.path.join(NEXMON_DIR, "patches", "include"), os.path.join(PROJECT_NEXMON_DIR, "patches", "include"))
     shutil.copytree(os.path.join(NEXMON_DIR, "patches", f"{mcu}"), os.path.join(PROJECT_NEXMON_DIR, "patches", f"{mcu}"))
-    
+    open(os.path.join(PROJECT_NEXMON_DIR, "patches", f"{mcu}", f"{firmware}", "nexmon", "src", "main.c"), "a").close()
 
-# Get environment variables for the nexmon build process
+env.Append(CPPPATH=[
+    os.path.join(PROJECT_NEXMON_DIR, "patches", "include"),
+    os.path.join(PROJECT_NEXMON_DIR, "patches", "common"),
+    os.path.join(PROJECT_NEXMON_DIR, "patches", "include"),
+    os.path.join(PROJECT_NEXMON_DIR, "firmwares", mcu, firmware)
+])
+
+# Get system specifications for the nexmon build process
 HOSTUNAME = (
     subprocess.check_output(["uname", "-s"]).decode(encoding="utf-8").replace("\n", "")
 )
@@ -92,9 +93,30 @@ PLATFORMUNAME = (
 )
 
 # Default compiler is currently for Linux x86_64
-if (HOSTUNAME in "Darwin") or (
-    (HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l") or PLATFORMUNAME in "armv6l"
-):
+if HOSTUNAME in "Linux" and PLATFORMUNAME in "x86_64":
+    os.environ["CC"] = os.path.join(
+        NEXMON_DIR,
+        "buildtools",
+        "gcc-arm-none-eabi-5_4-2016q2-linux-x86",
+        "bin",
+        "arm-none-eabi-",
+    )
+    os.environ["CCPLUGIN"] = os.path.join(
+        PROJECT_NEXMON_DIR, "buildtools", "gcc-nexmon-plugin", "nexmon.so"
+    )
+    os.environ["ZLIBFLATE"] = "zlib-flate -compress"
+elif (HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l") or PLATFORMUNAME in "armv6l":
+    os.environ["CC"] = os.path.join(
+        NEXMON_DIR,
+        "buildtools",
+        "gcc-arm-none-eabi-5_4-2016q2-linux-armv7l",
+        "bin",
+        "arm-none-eabi-",
+    )
+    os.environ["CCPLUGIN"] = os.path.join(
+        PROJECT_NEXMON_DIR, "buildtools", "gcc-nexmon-plugin-arm", "nexmon.so"
+    )
+else:
     raise NotImplementedError
 
 # Setting up the nexmon build environment
@@ -104,21 +126,10 @@ os.environ["KERNEL"] = "kernel7"
 os.environ["HOSTUNAME"] = HOSTUNAME
 os.environ["PLATFORMUNAME"] = PLATFORMUNAME
 os.environ["NEXMON_ROOT"] = PROJECT_NEXMON_DIR
-os.environ["CC"] = os.path.join(
-    NEXMON_DIR,
-    "buildtools",
-    "gcc-arm-none-eabi-5_4-2016q2-linux-x86",
-    "bin",
-    "arm-none-eabi-",
-)
-os.environ["CCPLUGIN"] = os.path.join(
-    PROJECT_NEXMON_DIR, "buildtools", "gcc-nexmon-plugin", "nexmon.so"
-)
-os.environ["ZLIBFLATE"] = "zlib-flate -compress"
 os.environ["Q"] = "@"
 os.environ["NEXMON_SETUP_ENV"] = "1"
 
-patch_path = glob.glob(f"{PROJECT_NEXMON_DIR}/patches/{mcu}/*/nexmon")[0]
+patch_path = os.path.join(PROJECT_NEXMON_DIR, "patches", mcu, firmware, "nexmon")
 
 # Build buildtools and firmware files
 rc = subprocess.call(["make", "-s"], cwd=PROJECT_NEXMON_DIR)
@@ -138,3 +149,4 @@ rc3 = subprocess.call(
     cwd=patch_path
 )
 
+print(rc, rc1, rc2, rc3)
