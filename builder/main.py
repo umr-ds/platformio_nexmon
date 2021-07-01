@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+    This is a dummy file as the nexmon platform for PlatformIO does not rely on any building functions that come with the PlatformIO building toolchain SCons but this file is still needed because PlatformIO won't initialise the project properly without it.
+"""
 from os.path import join
 
 from SCons.Script import (

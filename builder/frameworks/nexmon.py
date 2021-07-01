@@ -69,8 +69,10 @@ if isfile(os.path.join(SRC_DIR, "main.cpp")):
 if not isdir(PROJECT_NEXMON_DIR):
     os.mkdir(os.path.join(SRC_DIR, "nexmon"))
     shutil.copytree(BUILDTOOLS, os.path.join(PROJECT_NEXMON_DIR, "buildtools"))
-    shutil.copytree(os.path.join(FIRMWARES, f"{mcu}"), os.path.join(PROJECT_NEXMON_DIR, "firmwares", f"{mcu}"))
+    shutil.copytree(os.path.join(FIRMWARES, f"{mcu}", f"{firmware}"), os.path.join(PROJECT_NEXMON_DIR, "firmwares", f"{mcu}", f"{firmware}"))
     shutil.copy(os.path.join(FIRMWARES, "Makefile"), os.path.join(PROJECT_NEXMON_DIR, "firmwares"))
+    shutil.copy(os.path.join(FIRMWARES, f"{mcu}", "Makefile"), os.path.join(PROJECT_NEXMON_DIR, "firmwares", f"{mcu}"))
+    shutil.copy(os.path.join(FIRMWARES, f"{mcu}", "structs.common.h"), os.path.join(PROJECT_NEXMON_DIR, "firmwares", f"{mcu}"))
     shutil.copy(os.path.join(NEXMON_DIR, "Makefile"), PROJECT_NEXMON_DIR)
     shutil.copytree(os.path.join(NEXMON_DIR, "patches", "common"), os.path.join(PROJECT_NEXMON_DIR, "patches", "common"))
     shutil.copytree(os.path.join(NEXMON_DIR, "patches", "include"), os.path.join(PROJECT_NEXMON_DIR, "patches", "include"))
