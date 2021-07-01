@@ -241,4 +241,7 @@ rc2 = subprocess.call(["make", "backup-firmware"], cwd=patch_path)
 # Install new firmware
 rc3 = subprocess.call(["make", "install-firmware"], cwd=patch_path)
 
-print(rc, rc1, rc2, rc3)
+print(f"Building the buildtools exited with exit code: {rc}")
+print(f"Building the patch exited with exit code: {rc1}")
+print(f"Backing up the current firmware exited with exit code: {rc2}")
+print(f"Installing the new firmware exited with exit code: {rc3}")
