@@ -13,6 +13,8 @@ This is where PlatformIO will from now on store all information related to local
 
 Now to install this platform change directories to *~/.platformio/platforms/* and clone the repository into this folder.
 
+`git clone https://github.com/umr-ds/platformio_nexmon.git`
+
 At last open up Visual Studio Code, open the PlatformIO extension (There should be a symbol that looks like an ant head on the left of the VS Code window). Opening the extension should give you access to the quick access menu. There under *updates* execute the **Update All** function by left clicking and PlatformIO should automatically update its local database with the *Platform-Cypress* and the new boards.
 
 # Usage
