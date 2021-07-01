@@ -39,7 +39,7 @@ mcu = board.get("build.mcu")
 # needed for differentiating between multiple firmware versions (6_37_34_43, ...)
 firmware = board.get("build.firmware")
 
-FRAMEWORK_DIR = platform.get_package_dir("framework-mbed") # Spoofing Nexmon as mbed currently to skip having to publish it as a package
+FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
 PACKAGE_DIR = os.path.dirname(FRAMEWORK_DIR) # Directory that holds all local PlatformIO packages
 NEXMON_DIR = os.path.join(PACKAGE_DIR, "nexmon") # Directory inside of PlatformIO's package directory where nexmon is cloned to
 BUILDTOOLS = os.path.join(NEXMON_DIR, "buildtools") # Directory of nexmon's buildtools

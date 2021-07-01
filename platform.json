@@ -27,21 +27,11 @@
         }
     },
     "packages": {
-        "toolchain-gccarmnoneeabi":{ 
-            "type": "toolchain",
-            "owner": "platformio",
-            "version": "~1.90301"
-        },
         "framework-mbed": {
             "type": "framework",
             "optional": false,
             "owner": "platformio",
             "version": "~6.60600.0"
-        },
-        "tool-cmake": {
-            "optional": false,
-            "owner": "platformio",
-            "version": "~3.16.0"
         }
     }
 }
