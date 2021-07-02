@@ -6,6 +6,18 @@ This repository consists of the code and the necessary structure to represent a 
 When installed according to the steps described in [Installation](#installation) it can be used to create PlatformIO projects with nexmon support, allowing one to write custom patches for the target board.
 
 # Installation
+The following packages need to be installed locally for this to work properly:
+```
+pip3 install gitpython SCons
+sudo apt-get install git gawk qpdf adb flex bison
+```
+**The next commands are only necessary for x86_64 systems:**
+```
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
+```
+
 To use this repository install the Visual Studio Code extension [PlatformIO IDE](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide).
 
 The extension will automatically generate a .platformio folder at *~/.platformio*. (Assuming that you are on a machine running a UNIX OS)  
