@@ -1,0 +1,13 @@
+/home/chris/Programming/Rust/Libraries/c_to_rust/target/debug/deps/memchr-c9daf75d5b69006b.rmeta: /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/lib.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/fallback.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/iter.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/naive.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/mod.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/avx.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/sse2.rs
+
+/home/chris/Programming/Rust/Libraries/c_to_rust/target/debug/deps/libmemchr-c9daf75d5b69006b.rlib: /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/lib.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/fallback.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/iter.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/naive.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/mod.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/avx.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/sse2.rs
+
+/home/chris/Programming/Rust/Libraries/c_to_rust/target/debug/deps/memchr-c9daf75d5b69006b.d: /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/lib.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/fallback.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/iter.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/naive.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/mod.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/avx.rs /home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/sse2.rs
+
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/lib.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/fallback.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/iter.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/naive.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/mod.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/avx.rs:
+/home/chris/.cargo/registry/src/github.com-1ecc6299db9ec823/memchr-2.3.4/src/x86/sse2.rs:
