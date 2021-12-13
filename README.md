@@ -76,31 +76,3 @@ To build your custom patch follow these steps:
 8. The exit codes are process exit codes. Every other exit code besides 0 means something went wrong
 9.  To spare yourself from having to scroll through the error messages manually it is possible to execute the build process from a terminal and pipe the output into something like grep to provide a better overview
 10. Instead of executing build from the **Project Tasks** menu, open the **Quick Access** menu item, scroll down until you see **Miscellaneous** and left-click **PlatformIO Core CLI**. This will open a terminal in which you have access to PlatformIO's terminal interface. Type **pio run** into the terminal and pipe the output into something like grep to get a more sanitized build output.
-
-## Adding support for a new board
-To add support for a new board follow these steps:
-1. Create a new json file named after the board and the firmware you want to use inside `/platformio_nexmon/boards`
-   1. e.g. *nexmon_nexus5_6_37_34_43.json*
-2. Copy the following code into the new file and only edit the lines that have comments beside them:  
-    ```json
-    {
-        "build": {
-            "core": "arm",
-            "cpu": "arm8",
-            "f_cpu": "2300000000L",
-            "mcu": "bcm4339", //<-- replace this with the WiFi chip used by the new board
-            "firmware": "6_37_34_43" // <-- replace this with the firmware version you want to use
-        },
-        "frameworks": [
-            "mbed"
-        ],
-        "name": "Nexus 5 Nexmon 6_37_34_43", // <-- give the new board a recognizable name
-        "upload": {
-            "maximum_ram_size": 2147483648,
-            "maximum_size": 2147483648
-        },
-        "url": "https://www.qualcomm.com/media/documents/files/snapdragon-800-product-brief.pdf",
-        "vendor": "Qualcomm"
-    }
-    ```
-3. Now when you open the PlatformIO extension in VS Code and create a new project you should be able to search for the name of the new board
