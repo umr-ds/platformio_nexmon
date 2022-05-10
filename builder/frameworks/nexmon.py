@@ -40,14 +40,24 @@ mcu = board.get("build.mcu")
 firmware = board.get("build.firmware")
 
 FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
-PACKAGE_DIR = os.path.dirname(FRAMEWORK_DIR) # Directory that holds all local PlatformIO packages
-NEXMON_DIR = os.path.join(PACKAGE_DIR, "nexmon") # Directory inside of PlatformIO's package directory where nexmon is cloned to
-BUILDTOOLS = os.path.join(NEXMON_DIR, "buildtools") # Directory of nexmon's buildtools
-FIRMWARES = os.path.join(NEXMON_DIR, "firmwares") # Directory of nexmon's firmwares
-PROJECT_DIR = env["PROJECT_DIR"] # Directory where the project is generated
-SRC_DIR = os.path.join(PROJECT_DIR, "src") # Src folder of the generated project; the custom patch will be written in here
-LIB_DIR = os.path.join(PROJECT_DIR, "lib") # Lib folder of the generated project; all nexmon relevant files will go into here
-PROJECT_NEXMON_DIR = os.path.join(LIB_DIR, "nexmon") # Directory where nexmon is stored inside of the project
+PACKAGE_DIR = os.path.dirname(
+    FRAMEWORK_DIR
+)  # Directory that holds all local PlatformIO packages
+NEXMON_DIR = os.path.join(
+    PACKAGE_DIR, "nexmon"
+)  # Directory inside of PlatformIO's package directory where nexmon is cloned to
+BUILDTOOLS = os.path.join(NEXMON_DIR, "buildtools")  # Directory of nexmon's buildtools
+FIRMWARES = os.path.join(NEXMON_DIR, "firmwares")  # Directory of nexmon's firmwares
+PROJECT_DIR = env["PROJECT_DIR"]  # Directory where the project is generated
+SRC_DIR = os.path.join(
+    PROJECT_DIR, "src"
+)  # Src folder of the generated project; the custom patch will be written in here
+LIB_DIR = os.path.join(
+    PROJECT_DIR, "lib"
+)  # Lib folder of the generated project; all nexmon relevant files will go into here
+PROJECT_NEXMON_DIR = os.path.join(
+    LIB_DIR, "nexmon"
+)  # Directory where nexmon is stored inside of the project
 
 # If nexmon is not found, clone it into PlatformIO's package directory
 if not isdir(NEXMON_DIR):
@@ -177,17 +187,13 @@ env.Append(
 
 # Get system specifications for the nexmon build process
 HOSTUNAME = (
-    subprocess.check_output(["uname", "-s"])
-    .decode(encoding="utf-8")
-    .replace("\n", "")
+    subprocess.check_output(["uname", "-s"]).decode(encoding="utf-8").replace("\n", "")
 )
 PLATFORMUNAME = (
-    subprocess.check_output(["uname", "-m"])
-    .decode(encoding="utf-8")
-    .replace("\n", "")
+    subprocess.check_output(["uname", "-m"]).decode(encoding="utf-8").replace("\n", "")
 )
 
-# Default compiler is currently for Linux x86_64
+# Perform checks to set proper Nexmon compiler
 if HOSTUNAME in "Linux" and PLATFORMUNAME in "x86_64":
     os.environ["CC"] = os.path.join(
         NEXMON_DIR,
@@ -200,9 +206,7 @@ if HOSTUNAME in "Linux" and PLATFORMUNAME in "x86_64":
         NEXMON_DIR, "buildtools", "gcc-nexmon-plugin", "nexmon.so"
     )
     os.environ["ZLIBFLATE"] = "zlib-flate -compress"
-elif (
-    HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l"
-) or PLATFORMUNAME in "armv6l":
+elif (HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l") or PLATFORMUNAME in "armv6l":
     os.environ["CC"] = os.path.join(
         NEXMON_DIR,
         "buildtools",
@@ -212,6 +216,17 @@ elif (
     )
     os.environ["CCPLUGIN"] = os.path.join(
         NEXMON_DIR, "buildtools", "gcc-nexmon-plugin-arm", "nexmon.so"
+    )
+elif HOSTUNAME in "Darwin":
+    os.environ["CC"] = os.path.join(
+        NEXMON_DIR,
+        "buildtools",
+        "gcc-arm-none-eabi-5_4-2016q2-osx",
+        "bin",
+        "arm-none-eabi-",
+    )
+    os.environ["CCPLUGIN"] = os.path.join(
+        NEXMON_DIR, "buildtools", "gcc-nexmon-plugin-osx", "nexmon.so"
     )
 else:
     raise NotImplementedError

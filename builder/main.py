@@ -15,6 +15,7 @@
 """
     This is a dummy file as the nexmon platform for PlatformIO does not rely on any building functions that come with the PlatformIO building toolchain SCons but this file is still needed because PlatformIO won't initialise the project properly without it.
 """
+import subprocess
 from os.path import join
 
 from SCons.Script import (
@@ -31,30 +32,73 @@ platform = env.PioPlatform()
 board = env.BoardConfig()
 FRAMEWORK_DIR = platform.get_package_dir("framework-mbed")
 
-env.Replace(
-    AR="arm-none-eabi-ar",
-    AS="arm-none-eabi-as",
-    CC="arm-none-eabi-gcc",
-    CCFLAGS=[
-        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-    ],
-    CXX="arm-none-eabi-cpp",
-    OBJCOPY="arm-none-eabi-objcopy",
-    RANLIB="arm-none-eabi-ranlib",
-    SIZETOOL="arm-none-eabi-size",
-    ARFLAGS=["rc"],
-    SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx)\s+(\d+).*",
-    SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
-    SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
-    SIZEPRINTCMD="$SIZETOOL -B -d $SOURCES",
-    PROGSUFFIX=".elf",
+HOSTUNAME = (
+    subprocess.check_output(["uname", "-s"]).decode(encoding="utf-8").replace("\n", "")
+)
+PLATFORMUNAME = (
+    subprocess.check_output(["uname", "-m"]).decode(encoding="utf-8").replace("\n", "")
 )
 
-env.Replace(
-    CCFLAGS=[
-        "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-    ],
-)
+# Perform checks to set proper Nexmon compiler
+if HOSTUNAME in "Linux" and PLATFORMUNAME in "x86_64":
+    env.Replace(
+        AR="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-x86/bin/arm-none-eabi-ar",
+        AS="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-x86/bin/arm-none-eabi-as",
+        CC="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-x86/bin/arm-none-eabi-gcc",
+        CCFLAGS=[
+            "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+        ],
+        CXX="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-x86/bin/arm-none-eabi-cpp",
+        OBJCOPY="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-x86/bin/arm-none-eabi-objcopy",
+        RANLIB="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-x86/bin/arm-none-eabi-ranlib",
+        SIZETOOL="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-x86/bin/arm-none-eabi-size",
+        ARFLAGS=["rc"],
+        SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx)\s+(\d+).*",
+        SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
+        SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
+        SIZEPRINTCMD="$SIZETOOL -B -d $SOURCES",
+        PROGSUFFIX=".elf",
+    )
+elif (HOSTUNAME in "Linux" and PLATFORMUNAME in "armv7l") or PLATFORMUNAME in "armv6l":
+    env.Replace(
+        AR="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-armv7l/bin/arm-none-eabi-ar",
+        AS="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-armv7l/bin/arm-none-eabi-as",
+        CC="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-armv7l/bin/arm-none-eabi-gcc",
+        CCFLAGS=[
+            "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+        ],
+        CXX="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-armv7l/bin/arm-none-eabi-cpp",
+        OBJCOPY="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-armv7l/bin/arm-none-eabi-objcopy",
+        RANLIB="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-armv7l/bin/arm-none-eabi-ranlib",
+        SIZETOOL="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-linux-armv7l/bin/arm-none-eabi-size",
+        ARFLAGS=["rc"],
+        SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx)\s+(\d+).*",
+        SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
+        SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
+        SIZEPRINTCMD="$SIZETOOL -B -d $SOURCES",
+        PROGSUFFIX=".elf",
+    )
+elif HOSTUNAME in "Darwin":
+    env.Replace(
+        AR="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-osx/bin/arm-none-eabi-ar",
+        AS="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-osx/bin/arm-none-eabi-as",
+        CC="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-osx/bin/arm-none-eabi-gcc",
+        CCFLAGS=[
+            "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+        ],
+        CXX="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-osx/bin/arm-none-eabi-cpp",
+        OBJCOPY="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-osx/bin/arm-none-eabi-objcopy",
+        RANLIB="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-osx/bin/arm-none-eabi-ranlib",
+        SIZETOOL="~/.platformio/packages/nexmon/buildtools/gcc-arm-none-eabi-5_4-2016q2-osx/bin/arm-none-eabi-size",
+        ARFLAGS=["rc"],
+        SIZEPROGREGEXP=r"^(?:\.text|\.data|\.rodata|\.text.align|\.ARM.exidx)\s+(\d+).*",
+        SIZEDATAREGEXP=r"^(?:\.data|\.bss|\.noinit)\s+(\d+).*",
+        SIZECHECKCMD="$SIZETOOL -A -d $SOURCES",
+        SIZEPRINTCMD="$SIZETOOL -B -d $SOURCES",
+        PROGSUFFIX=".elf",
+    )
+else:
+    raise NotImplementedError
 
 # Allow user to override via pre:script
 if env.get("PROGNAME", "program") == "program":

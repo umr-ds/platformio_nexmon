@@ -28,11 +28,7 @@ To use this repository install the Visual Studio Code extension [PlatformIO IDE]
 The extension will automatically generate a .platformio folder at _~/.platformio_. (Assuming that you are on a machine running a UNIX OS)  
 This is where PlatformIO will from now on store all information related to locally installed platforms, packages or boards.
 
-Now to install this platform change directories to _~/.platformio/platforms/_ and clone the repository into this folder.
-
-`git clone https://github.com/umr-ds/platformio_nexmon.git`
-
-At last open up Visual Studio Code, open the PlatformIO extension (There should be a symbol that looks like an ant head on the left of the VS Code window). Opening the extension should give you access to the quick access menu. There under _updates_ execute the **Update All** function by left clicking and PlatformIO should automatically update its local database with the _Platform-Cypress_ and the new boards.
+Now to install this platform open VS Code, then open the PlatformIO extension (Ant head on the left of your editor window). Under **PIO Home** navigate to **Platforms** and select **Advanced Installation**. Insert the repository `https://github.com/umr-ds/platformio_nexmon.git` into the new window and click **Install**. After a while a new window should inform you about the successful installation. The installed platform should be listed under **Platforms** and can be used to instantiate new projects. 
 
 # Usage
 
@@ -41,7 +37,7 @@ At last open up Visual Studio Code, open the PlatformIO extension (There should 
 Now in order to use this platform for creating a new project to write a custom patch with nexmon just follow along these steps:
 
 1. Open VS Code
-2. Open the PlatformIO extension's quick access menu by left clicking the ant head on the left of your VS Code window
+2. Open the PlatformIO extension's quick access menu
 3. Under **PIO Home** left-click **Open**
 4. PlatformIO's home menu should open inside of VS Code with another quick access menu
 5. Left-click **+ New Project**. This should open PlatformIO's project wizard.
@@ -77,9 +73,9 @@ Then:
 source .bashrc
 ```
 
-or restart your shell.
+and restart VS Code.
 
-**Note:** Replace `python3.8` in the path by whatever python version you used to install `gitpython` and `SCons` or, if you have multiple python version add all of their site-packages folders to the path.
+**Note:** Replace `python3.8` in the path by whatever python version you used to install `gitpython` and `SCons` or, if you have multiple python version, add all of their site-packages folders to the path.
 
 ## Writing a custom patch
 
@@ -102,6 +98,6 @@ To build your custom patch follow these steps:
    Backing up the current firmware exited with exit code: 0
    Installing the new firmware exited with exit code: 0
    ```
-8. The exit codes are process exit codes. Every other exit code besides 0 means something went wrong
-9. To spare yourself from having to scroll through the error messages manually it is possible to execute the build process from a terminal and pipe the output into something like grep to provide a better overview
-10. Instead of executing build from the **Project Tasks** menu, open the **Quick Access** menu item, scroll down until you see **Miscellaneous** and left-click **PlatformIO Core CLI**. This will open a terminal in which you have access to PlatformIO's terminal interface. Type **pio run** into the terminal and pipe the output into something like grep to get a more sanitized build output.
+   1. The exit codes are process exit codes. Every other exit code besides 0 means something went wrong
+   2. To spare yourself from having to scroll through the error messages manually it is possible to execute the build process from a terminal and pipe the output into something like grep to provide a better overview
+   3.  Instead of executing build from the **Project Tasks** menu, open the **Quick Access** menu item, scroll down until you see **Miscellaneous** and left-click **PlatformIO Core CLI**. This will open a terminal in which you have access to PlatformIO's terminal interface. Type **pio run** into the terminal and pipe the output into something like grep to get a more sanitized build output.
